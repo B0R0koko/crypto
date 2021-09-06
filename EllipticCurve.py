@@ -1,19 +1,7 @@
-Pcurve = 2**256 - 2**32 - 2**9 - 2**8 - 2**7 - 2**6 - 2**4 -1 
-Acurve = 0
-Bcurve = 7
-Gx = 0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798 
-Gy = 0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8
-GPoint = (int(Gx),int(Gy))
-Nparam = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
-
-class Point():
-
-    def __init__(self, x, y):  
-        self.x = x
-        self.y = y
+import hashlib
 
 
-class EllipticCurve():
+class EllipticCurve():  #Using Elliptic curve over finite field to generate key pair
 
     def __init__(self, a_coef, b_coef, mod, gpoint):
         self.a_coef = a_coef
@@ -21,40 +9,58 @@ class EllipticCurve():
         self.mod = mod
         self.gpoint = gpoint
     
-    def modInverse(self, num, mod) : 
-        num %= mod; 
-        for i in range(1, mod) : 
-            if (num * i) % mod == 1:
-                return i
-        return 1
-  
+    def modular_inverse(self, num, mod):  #Extended Euclidian Algorithm for modular inverse
+        while(num < 0):  #Later found out built-in pow(a, -1, b) does the same
+            num += mod
+        x1, x2, x3 = 1, 0, mod
+        y1, y2, y3 = 0, 1, num
+        q = x3 // y3
+        t1 = x1 - q*y1
+        t2 = x2 - q*y2
+        t3 = x3 - q*y3
+        while(y3 != 1):
+            x1, x2, x3 = y1, y2, y3
+            y1, y2, y3 = t1, t2, t3
+            q = x3 // y3
+            t1 = x1 - q*y1
+            t2 = x2 - q*y2
+            t3 = x3 - q*y3
+        while(y2 < 0):
+            y2 = y2 + mod	
+        return y2
 
-    def ECAdd(self, first, second):
-        lam = (second.y - first.y) * self.modInverse(second.x - first.x, self.mod)
-        x_r = (lam**2 - first.x - second.x) % self.mod
-        y_r = (lam * (first.x - x_r) - first.y) % self.mod
-        return Point(x_r, y_r)
-
-    def ECDouble(self, first):
-        lam = (3 * first.x**2 + self.a_coef) * self.modInverse(2 * first.y, self.mod)
-        x_r = (lam**2 - 2 * first.x) % self.mod
-        y_r = (lam * (first.x - x_r) - first.y) % self.mod
-        return Point(x_r, y_r)
+    def ECAdd(self, x1, y1, x2, y2):
+        if x1 == x2 and y1 == y2:  #Tangent case (Doubling)
+            beta = (3*x1**2 + self.a_coef) * self.modular_inverse(2*y1, self.mod)
+        else:  #Addition case 
+            beta = (y2 - y1) * self.modular_inverse((x2 - x1), self.mod)
+        x3 = beta**2 - x1 - x2
+        y3 = beta*(x1 - x3) - y1
+        x3 = x3 % self.mod
+        y3 = y3 % self.mod
+        return x3, y3
 
     def ECMultiply(self, private_key):
+        x0, y0 = self.gpoint
+        xt, yt = x0, y0
         binary_key = str(bin(private_key))[2:]
-        point = self.gpoint
         for i in range (1, len(binary_key)):
-            point = self.ECDouble(point); 
+            xt, yt = self.ECAdd(xt, yt, xt, yt)  #Doubling
             if binary_key[i] == "1":
-                point = self.ECAdd(point, self.gpoint)
-        return point
+                xt, yt = self.ECAdd(xt, yt, x0, y0)
+        return xt, yt
 
+# Recommended parameters for using Elliptic Curve Secp236k1
+Pcurve = 2**256 - 2**32 - 2**9 - 2**8 - 2**7 - 2**6 - 2**4 -1 
+Acurve = 0
+Bcurve = 7
+Gx = 0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798 
+Gy = 0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8
+Nparam = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
 
+a = EllipticCurve(0, 7, Pcurve, (Gx, Gy))  #Initialise with essential variables
 
-a = EllipticCurve(0, 7, Pcurve, Point(Gx, Gy))
-
-private_key = 583
-
-public_key = a.ECMultiply(private_key)
-print(public_key.x, public_key.y)
+private_key = 0xa4f228d49910e8ecb53ba6f23f33fbfd2bad442e902ea20b8cf89c473237bf9f
+ecx, ecy = a.ECMultiply(private_key)
+public_key = hex(ecx)
+print(public_key)
