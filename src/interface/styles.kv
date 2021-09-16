@@ -1,0 +1,87 @@
+#:import utils kivy.utils
+
+<OptionButton@Button>
+    font_size: 30
+    bold: True
+    italic: True
+    background_color: (0,0,0,0)
+    background_normal: ''
+    canvas.before:
+        Color:
+            rgba: (250/255, 162/255, 0/255, 1)
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [58]
+
+
+<MainLay>
+
+    canvas.before:
+        Color:
+            rgba: utils.get_color_from_hex("#b08309")
+            
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    BoxLayout:
+        orientation: 'vertical'
+        size: root.width, root.height
+        padding: 30
+
+        BoxLayout:
+            size_hint: 1, 0.2
+
+            BoxLayout:
+                size_hint: 0.2, 1
+                padding: 30
+
+                Image:
+                    source: 'images/bitcoin.png'
+
+            BoxLayout:
+                size_hint: 0.8, 1
+
+                Label:
+                    text: 'Bitcoin App 0.0.1'
+                    font_size: 50
+                    bold: True
+                    italic: True
+
+        BoxLayout:
+            size_hint: 1, 0.8
+            spacing: 10
+
+            BoxLayout:
+                spacing: 10
+                orientation: 'vertical'
+                size_hint: 0.2, 1
+
+                OptionButton:
+                    text: 'Wallet'
+
+                OptionButton:
+                    text: 'Generate Wallet'
+
+                OptionButton:
+                    text: 'Info'
+
+            BoxLayout:
+                margin: 
+                size_hint: 0.8, 1
+
+                BoxLayout:
+                    background_color: (0,0,0,0)
+                    background_normal: ''
+                    canvas.before:
+                        Color: 
+                            rgba: (1,1,1,1)
+                        RoundedRectangle:
+                            size: self.size
+                            pos: self.pos
+                            radius: [58]
+
+                
+
+            
