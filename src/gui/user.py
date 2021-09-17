@@ -9,15 +9,17 @@ Builder.load_file('src/gui/styles.kv')
 
 class MainLay(Widget):
     
-    def generate_address(self):
-        private_key = PrivateKeyGenerator.generate_from_png('bitcoin.png')
+    def generate_address(self, path):
+        if path == '':
+            self.ids.generated_address.text = 'Empty address'
+            return
+        private_key = PrivateKeyGenerator.generate_from_png(path)
         public_key = PublicKeyGenerator().generate_key(private_key)
         private_key = str(hex(private_key))
         public_key = str(hex(public_key[0]))
         self.ids.generated_address.text = f'Private Address: {private_key}\nPublic Address: {public_key}'
-
+        return
         
-
 
 class UserUI(App):
     def build(self):
@@ -26,9 +28,3 @@ class UserUI(App):
 if __name__ == "__main__":
     app = UserUI()
     app.run()
-
-
-
-
-
-

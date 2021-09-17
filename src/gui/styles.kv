@@ -85,18 +85,17 @@
 
                     BoxLayout:
                         orientation: 'vertical'
-                        size_hint: 1, .5
+                        TextInput:
+                            id: path
+                            size_hint: 1, 0.3
+                            text: 'Enter full path to picture'
                         Button:
+                            size_hint: 1, 0.2
                             text: 'Generate New Bitcoin Address'
-                            on_press: root.generate_address()
+                            on_press: root.generate_address(path.text)
                     
                         Label:
                             size_hint: 1, .5
                             id: generated_address
                             text: 'No address yet'
-                            font_size: 25
-
-
-                
-
-            
+                            font_size: 25   
