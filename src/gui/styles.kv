@@ -38,7 +38,7 @@
                 padding: 30
 
                 Image:
-                    source: 'images/bitcoin.png'
+                    source: 'src/gui/images/bitcoin.png'
 
             BoxLayout:
                 size_hint: 0.8, 1
@@ -72,15 +72,30 @@
                 size_hint: 0.8, 1
 
                 BoxLayout:
-                    background_color: (0,0,0,0)
-                    background_normal: ''
-                    canvas.before:
-                        Color: 
-                            rgba: (1,1,1,1)
-                        RoundedRectangle:
-                            size: self.size
-                            pos: self.pos
-                            radius: [58]
+                    orientation: 'vertical'
+                #     background_color: (0,0,0,0)
+                #     background_normal: ''
+                #     canvas.before:
+                #         Color: 
+                #             rgba: (1,1,1,1)
+                #         RoundedRectangle:
+                #             size: self.size
+                #             pos: self.pos
+                #             radius: [58]
+
+                    BoxLayout:
+                        orientation: 'vertical'
+                        size_hint: 1, .5
+                        Button:
+                            text: 'Generate New Bitcoin Address'
+                            on_press: root.generate_address()
+                    
+                        Label:
+                            size_hint: 1, .5
+                            id: generated_address
+                            text: 'No address yet'
+                            font_size: 25
+
 
                 
 

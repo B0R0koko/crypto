@@ -1,7 +1,16 @@
 import hashlib
 
+class PrivateKeyGenerator():  #Convert taken or loaded picture to private key using sha256 
 
-class EllipticCurve():  #Using Elliptic curve over finite field to generate key pair
+    def generate_from_png(path):
+        with open(path, 'rb') as file:
+            b = bytes(file.read())
+        h = hashlib.sha256(b)
+        private_key = h.hexdigest()
+        private_key = int(private_key, 16)
+        return private_key  #Cannot return hex straight away so its int 16 base
+
+class PublicKeyGenerator():  #Using Elliptic curve over finite field to generate key pair
 
     # Recommended parameters for using Elliptic Curve Secp236k1
 
@@ -56,8 +65,9 @@ class EllipticCurve():  #Using Elliptic curve over finite field to generate key 
 
 
 if __name__ == "__main__":
-    a = EllipticCurve()
-    private_key = 0x5c77b75031dc98e7dce5d6cddc0d23e2c357fe4888b9ea54fc05be3a95794d2a
+    a = PublicKeyGenerator()
+    private_key = PrivateKeyGenerator.generate_from_png('bitcoin.png')
     ecx, ecy = a.generate_key(private_key)
     public_key = hex(ecx)
     print(public_key)
+    print(hex(private_key))
