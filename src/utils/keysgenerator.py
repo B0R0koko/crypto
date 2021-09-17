@@ -3,9 +3,12 @@ import hashlib
 class PrivateKeyGenerator():  #Convert taken or loaded picture to private key using sha256 
 
     def generate_from_png(path):
-        with open(path, 'rb') as file:
-            b = bytes(file.read())
-        h = hashlib.sha256(b)
+        if path.startswith('W'):
+            bytestring = bytes(path[1:], 'utf-8') 
+        else:
+            with open(path, 'rb') as file:
+                bytestring = bytes(file.read())
+        h = hashlib.sha256(bytestring)
         private_key = h.hexdigest()
         private_key = int(private_key, 16)
         return private_key  #Cannot return hex straight away so its int 16 base
